@@ -506,7 +506,7 @@ shakeOpen lspEnv defaultConfig logger debouncer
         pure (ShakeExtras{..}, cancel progressAsync)
     (shakeDbM, shakeClose) <-
         shakeOpenDatabase
-            opts { shakeExtra = addShakeExtra shakeExtras $ shakeExtra opts }
+            opts { shakeExtra = newShakeExtra shakeExtras }
             rules
     shakeDb <- shakeDbM
     shakeSession <- newEmptyMVar
@@ -935,9 +935,9 @@ defineEarlyCutoff
     :: IdeRule k v
     => RuleBody k v
     -> Rules ()
-defineEarlyCutoff (Rule op) = addBuiltinRule noLint noIdentity $ \(Q (key, file)) (old :: Maybe BS.ByteString) mode -> otTracedAction key file isSuccess $ do
+defineEarlyCutoff (Rule op) = addRule $ \(Q (key, file)) (old :: Maybe BS.ByteString) mode -> otTracedAction key file isSuccess $ do
     defineEarlyCutoff' True key file old mode $ op key file
-defineEarlyCutoff (RuleNoDiagnostics op) = addBuiltinRule noLint noIdentity $ \(Q (key, file)) (old :: Maybe BS.ByteString) mode -> otTracedAction key file isSuccess $ do
+defineEarlyCutoff (RuleNoDiagnostics op) = addRule $ \(Q (key, file)) (old :: Maybe BS.ByteString) mode -> otTracedAction key file isSuccess $ do
     defineEarlyCutoff' False key file old mode $ second (mempty,) <$> op key file
 
 defineEarlyCutoff'
@@ -1048,7 +1048,7 @@ defineOnDisk
   :: (Shake.ShakeValue k, RuleResult k ~ ())
   => (k -> NormalizedFilePath -> OnDiskRule)
   -> Rules ()
-defineOnDisk act = addBuiltinRule noLint noIdentity $
+defineOnDisk act = addRule $
   \(QDisk key file) (mbOld :: Maybe BS.ByteString) mode -> do
       extras <- getShakeExtras
       let OnDiskRule{..} = act key file
