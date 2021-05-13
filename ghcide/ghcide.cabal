@@ -200,7 +200,7 @@ library
         Development.IDE.Plugin.Completions.Logic
         Development.IDE.Session.VersionCheck
         Development.IDE.Types.Action
-    ghc-options: -Wall -Wno-name-shadowing -Wincomplete-uni-patterns -Wno-unticked-promoted-constructors
+    ghc-options: -Wall -Wno-name-shadowing -Wincomplete-uni-patterns -Wno-unticked-promoted-constructors -dynamic
 
     if flag(ghc-patched-unboxed-bytecode)
       cpp-options: -DGHC_PATCHED_UNBOXED_BYTECODE
@@ -257,7 +257,7 @@ executable ghcide
         include
     hs-source-dirs:     exe
     ghc-options:
-                -threaded
+                -threaded -dynamic
                 -Wall
                 -Wincomplete-uni-patterns
                 -Wno-name-shadowing
